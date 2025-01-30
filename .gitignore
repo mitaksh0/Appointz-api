@@ -1,0 +1,41 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output of build process
+/bin/
+/out/
+/build/
+*.test
+
+# Dependencies
+vendor/
+
+# Configuration files
+.env
+*.config.json
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and runtime data
+*.log
+*.pid
+*.lock
+/tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test cache
+/testdata/
+
+# Module and cache directories
+go.sum
+go.mod

@@ -1,0 +1,62 @@
+Pre-Requisites: Setup Postgres server and add below along with values in .env in root folder:
+ALLOWED_URL={value}
+DB_HOST={value}
+DB_PORT={value}
+DB_NAME={value}
+DB_USER={value}
+DB_PASS={value}
+
+Create necessary tables using migrate
+
+// Login Route (Un-protected)
+Route: /login
+Method: POST
+About: Using login credentials returns and set JWT token to the front 
+
+// Register Route (Un-protected)
+Route: /register
+Method: POST
+About: Create new user if not already created. Only 1 user can be created using email + role combination and no username can be used twice.
+
+// Logout Route (Protected)
+Route: /logout
+Method: POST
+About: Set session token expiry to 0, delets immediately
+
+
+//======Patients Routes======//
+// Patients Route (Protected)
+Route: /patients
+Query Params(Optional for GET): id={id}
+Method: GET, POST, PATH, DELETE
+About: Performs CRUD operations on patients table, Except GET, all methods require ID to be passed as Params along with other necessary body info.
+
+Data required:
+
+GET: ID gets single user, omitting ID gets all.
+
+POST: Requires all the fields. ID not required as it will be generated. Example: {
+	first_name: {value},  
+	last_name: {value},  
+	date_of_birth: {value},    
+	gender: {value}, 
+	contact: {value},
+	address: {value},
+}
+
+DELETE: Delete single patient, ID mandatory.
+
+PATCH: Requires all fields along with ID. Full object will be updated. Example: {
+	first_name: {value},  
+	last_name: {value},  
+	date_of_birth: {value},    
+	gender: {value}, 
+	contact: {value},
+	address: {value},
+}
+
+//======Patients Routes END======//
+
+//======Appointments Routes======//
+
+//======Appointments RoutesEND======//
