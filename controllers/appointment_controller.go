@@ -2,28 +2,29 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/appointments_api/models"
 	"github.com/appointments_api/utils"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // crud operations for appointments table
 func AppointmentHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 	appointmentId := queryParams.Get("id")
-	userId := queryParams.Get("user-id")
+	ctx := r.Context().Value(models.PayloadContextKey)
+
+	payload := ctx.(jwt.MapClaims)
+	userId := payload["userId"].(float64)
+	role := payload["role"].(string)
 
 	// get user role
-	userIdInt, _ := strconv.Atoi(appointmentId)
-	if userId == "" || userIdInt == 0 {
-		utils.GenerateResponse(w, http.StatusUnauthorized, "user id not found in request")
-		return
-	}
-	userRoles, err := models.GetRoles(userIdInt)
-	if err != nil {
-		utils.GenerateResponse(w, http.StatusInternalServerError, err.Error())
+	userIdInt := int(userId)
+	if userId == 0 || userIdInt == 0 || role == "" {
+		utils.GenerateResponse(w, http.StatusUnauthorized, "error in session, please login again")
 		return
 	}
 
@@ -65,27 +66,26 @@ func AppointmentHandler(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodPost:
 
-		for key := range userRoles {
-			if key != "receptionist" {
-				utils.GenerateResponse(w, http.StatusUnauthorized, "user not authorized for this request")
-				return
-			}
+		if role != "receptionist" {
+			utils.GenerateResponse(w, http.StatusUnauthorized, "user not authorized for this request")
+			return
 		}
 
 		var a models.Appointment
 
 		err := json.NewDecoder(r.Body).Decode(&a)
 		if err != nil {
+			fmt.Println(err)
 			utils.GenerateResponse(w, http.StatusInternalServerError, "error parsing data")
 			return
 		}
 
-		if a.AppointmentDate == "" || a.Notes == "" || a.RecepID == 0 || a.PatientID == 0 {
+		if a.AppointmentDate == "" || a.Notes == "" || a.PatientID == "" || a.AppointmentTime == "" {
 			utils.GenerateResponse(w, http.StatusBadRequest, "missing data in input field(s)")
 			return
 		}
 
-		err = models.AddAppointment(a)
+		err = models.AddAppointment(a, userIdInt)
 		if err != nil {
 			utils.GenerateResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -107,7 +107,7 @@ func AppointmentHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			utils.GenerateResponse(w, http.StatusInternalServerError, "error parsing data")
 			return
-		} else if a.AppointmentDate == "" || a.Notes == "" || a.RecepID == 0 || a.PatientID == 0 {
+		} else if a.AppointmentDate == "" || a.Notes == "" || a.PatientID == "" {
 			utils.GenerateResponse(w, http.StatusBadRequest, "missing data in input field(s)")
 			return
 		}
@@ -123,11 +123,9 @@ func AppointmentHandler(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodDelete:
 
-		for key := range userRoles {
-			if key != "receptionist" {
-				utils.GenerateResponse(w, http.StatusUnauthorized, "user not authorized for this request")
-				return
-			}
+		if role != "receptionist" {
+			utils.GenerateResponse(w, http.StatusUnauthorized, "user not authorized for this request")
+			return
 		}
 
 		if appointmentId == "" {

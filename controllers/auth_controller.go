@@ -161,3 +161,40 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	utils.GenerateResponse(w, http.StatusOK, "logged out successfully")
 }
+
+// Return user info, and their roles for admin page
+func AdminPage(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "GET" {
+		utils.GenerateResponse(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	ctx := r.Context().Value(models.PayloadContextKey)
+
+	payload := ctx.(jwt.MapClaims)
+	userId := payload["userId"].(float64)
+	role := payload["role"].(string)
+
+	if userId == 0 || role == "" {
+		utils.GenerateResponse(w, http.StatusBadRequest, "session timed out")
+		return
+	}
+
+	user, err := models.GetRoles(int(userId))
+	if err != nil {
+		utils.GenerateResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	roles, ok := user[role]
+	if !ok || len(roles) != 1 {
+		utils.GenerateResponse(w, http.StatusInternalServerError, "invalid session")
+		return
+	}
+
+	userWithRole := roles[0]
+	userWithRole.Type = role
+
+	utils.GenerateResponse(w, http.StatusOK, userWithRole)
+}

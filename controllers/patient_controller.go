@@ -26,7 +26,6 @@ func PatientsHandler(w http.ResponseWriter, r *http.Request) {
 	// get user role
 	userIdInt := int(userId)
 	if userId == 0 || userIdInt == 0 || role == "" {
-		fmt.Println("here")
 		utils.GenerateResponse(w, http.StatusUnauthorized, "error in session, please login again")
 		return
 	}

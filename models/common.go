@@ -38,13 +38,14 @@ type Role struct {
 
 type Appointment struct {
 	ID              int     `json:"id"`
-	PatientID       int     `json:"patient_id"`       // from patients table
-	DoctorID        int     `json:"doctor_id"`        // from users table role doctor
-	RecepID         int     `json:"recep_id"`         // from users table role receptionist
+	PatientID       string  `json:"patient_id"`       // from patients table
+	DoctorID        string  `json:"doctor_id"`        // from users table role doctor
+	RecepID         string  `json:"recep_id"`         // from users table role receptionist
 	AppointmentDate string  `json:"appointment_date"` // date for appointment
+	AppointmentTime string  `json:"appointment_time"` // date for appointment
 	Notes           string  `json:"notes"`            // about the patient, what the appointment is for
 	ReceptionInfo   Role    `json:"reception_info"`
 	DocInfo         Role    `json:"doctor_info,omitempty"`
 	PatientInfo     Patient `json:"patient_info"`
-	Doctors         []Role  `json:"doctors,omitempty"`
+	// Doctors         []Role  `json:"doctors,omitempty"`
 }

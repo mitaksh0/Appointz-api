@@ -94,3 +94,28 @@ func GetRoles(id int) (map[string][]Role, error) {
 
 	return userRoles, nil
 }
+
+func GetUsers(role string) ([]Role, error) {
+	sqlStr := `SELECT id, name FROM users
+	WHERE role = $1 AND name IS NOT NULL
+	ORDER BY name, username`
+	rows, err := db.Db.Query(sqlStr, role)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var users []Role
+
+	for rows.Next() {
+		var user Role
+		err := rows.Scan(&user.ID, &user.Name)
+
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}

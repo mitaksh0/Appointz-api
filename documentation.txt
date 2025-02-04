@@ -7,6 +7,13 @@ DB_USER={value}
 DB_PASS={value}
 
 Create necessary tables using migrate
+go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+Apply the migration: Run the migration to set up the tables in the database.
+migrate -path db/migrations -database "postgres://user:password@localhost:5432/dbname?sslmode=disable" up
+
+Roll back the migration (if needed): If you need to undo the migration, you can use:
+migrate -path db/migrations -database "postgres://user:password@localhost:5432/dbname?sslmode=disable" down
 
 // Login Route (Un-protected)
 Route: /login
@@ -23,6 +30,10 @@ Route: /logout
 Method: POST
 About: Set session token expiry to 0, delets immediately
 
+// Admin Route (Protected)
+Route: /admin
+Method: GET
+About: Return logged in user info
 
 //======Patients Routes======//
 // Patients Route (Protected)
@@ -57,6 +68,53 @@ PATCH: Requires all fields along with ID. Full object will be updated. Example: 
 
 //======Patients Routes END======//
 
+
 //======Appointments Routes======//
+
+// Appointments Route (Protected)
+Route: /appointments
+Query Params(Optional for GET): id={id}
+Method: GET, POST, PATH, DELETE
+About: Performs CRUD operations on appointments table, Except GET, all methods require ID to be passed as Params along with other necessary body info.
+
+Data required:
+
+GET: ID gets single appointment, omitting ID gets all.  (/appointments?id={value})
+Example: {
+	id: {value},
+	appointment_date: {value},
+	appointment_time: {value},
+	notes: {value},
+	reception_info: {object {
+		id: {value}
+		name: {value}
+	}},
+	doctor_info: {object {
+		id: {value}
+		name: {value}
+	}},
+	patient_info: {object {
+		id: {value}
+		name: {value}
+	}},
+}
+
+POST: Requires all the fields. ID not required as it will be generated. Example: {
+	patient_id: {value},  
+	docto_id: {value},  
+	appointment_date: {value},    
+	appointment_time: {value}, 
+	notes: {value},
+}
+
+DELETE: Delete single patient, ID mandatory.
+
+PATCH: Requires all fields along with ID. Full object will be updated. Example: {
+	patient_id: {value},  
+	docto_id: {value},  
+	appointment_date: {value},    
+	appointment_time: {value}, 
+	notes: {value},
+}
 
 //======Appointments RoutesEND======//

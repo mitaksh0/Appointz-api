@@ -17,11 +17,11 @@ func initRoutes(router *http.ServeMux) {
 
 	// AUTH ROUTES
 	router.Handle("/logout", middleware.JWTAuth(http.HandlerFunc(controllers.Logout)))
-	// router.Handle("/register", middleware.JWTAuth(http.HandlerFunc(controllers.Register)))
 
 	// USER ROUTES
 	router.Handle("/patients", middleware.JWTAuth(http.HandlerFunc(controllers.PatientsHandler)))
-	// router.Handle("/patients", http.HandlerFunc(controllers.PatientsHandler))
-	router.Handle("/appointments", http.HandlerFunc(controllers.AppointmentHandler))
+	router.Handle("/appointments", middleware.JWTAuth(http.HandlerFunc(controllers.AppointmentHandler)))
+	router.Handle("/users", middleware.JWTAuth(http.HandlerFunc(controllers.UsersHandler)))
+	router.Handle("/admin", middleware.JWTAuth(http.HandlerFunc(controllers.AdminPage)))
 
 }
