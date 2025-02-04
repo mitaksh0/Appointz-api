@@ -35,7 +35,3 @@ Thumbs.db
 
 # Test cache
 /testdata/
-
-# Module and cache directories
-go.sum
-go.mod
